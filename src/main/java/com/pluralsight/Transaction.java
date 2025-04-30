@@ -3,21 +3,68 @@ package com.pluralsight;
 import java.util.Date;
 
 public class Transaction {
-    private String transactionId;
+    //date|time|description|vendor(transactionID|type|amount|account
     private Date transactionDate; // date of transaction
     private String description; // what the payment was for ex: "Rent payment"
-    private Double amount; // transaction amount
+    private String vendor; // Vendor
     private String type; // Debit or Credit transaction
-    private String category; // helps organize transactions ex: "Rent", "Entertainment", "Insurance", etc
+    private double amount; // transaction amount
     private String account; // savings or checking
 
-    public Transaction(String transactionId, Date transactionDate, String description, Double amount, String type, String category, String account) {
-        this.transactionId = transactionId;
+    public Transaction(Date transactionDate, String description, String vendor, double amount, String type, String account) {
         this.transactionDate = transactionDate;
+        this.vendor = vendor;
         this.description = description;
-        amount = amount;
         this.type = type;
-        this.category = category;
+        this.account = account;
+    }
+
+    public Date getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    public void setTransactionDate(Date transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setVe(String description) {
+        this.description = description;
+    }
+
+    public String getVendor() {
+        return this.vendor;
+    }
+
+    public void setVendor(String transactionId) {
+        this.vendor = transactionId;
+    }
+
+    public double getAmount() {
+        return this.amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
+    public String getAccount() {
+        return this.account;
+    }
+
+    public void setAccount(String account) {
         this.account = account;
     }
 
@@ -25,12 +72,12 @@ public class Transaction {
     public boolean isTransactionValid() {
         // Checks that the amount of money enter is greater than 0
         // Because you can't have a transaction with zero or negative money
-        if (amount <= 0) {
-            System.out.print("Error: Amount must be greater than zero");
+        if (amount < 0) {
+            System.out.print("Error: Amount must be greater than zero ");
             return false;
         }
         // Makes sure that the transaction is either with Debit or Credit
-        if (!type.equalsIgnoreCase("Debit") || !type.equalsIgnoreCase("Credit")) {
+        if (!type.equalsIgnoreCase("Debit") && !type.equalsIgnoreCase("Credit")) {
             System.out.print("Error: Transaction must be either 'Debit' or 'Credit'. ");
             return false;
         }
