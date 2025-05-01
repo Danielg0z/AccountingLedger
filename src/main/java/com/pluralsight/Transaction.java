@@ -14,6 +14,7 @@ public class Transaction {
     public Transaction(Date transactionDate, String description, String vendor, double amount, String type, String account) {
         this.transactionDate = transactionDate;
         this.vendor = vendor;
+        this.amount = amount;
         this.description = description;
         this.type = type;
         this.account = account;
@@ -79,6 +80,11 @@ public class Transaction {
         // Makes sure that the transaction is either with Debit or Credit
         if (!type.equalsIgnoreCase("Debit") && !type.equalsIgnoreCase("Credit")) {
             System.out.print("Error: Transaction must be either 'Debit' or 'Credit'. ");
+            return false;
+        }
+        //Make sure that the account is either checking or savings
+        if (!account.equalsIgnoreCase("Checking") && !account.equalsIgnoreCase("Savings")) {
+            System.out.print("Error: Transaction must be either 'Checking' or 'Savings'. ");
             return false;
         }
         return true;

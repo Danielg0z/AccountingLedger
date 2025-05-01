@@ -1,12 +1,8 @@
 package com.pluralsight;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Scanner;
 
 //For the readme file use a language called markdown to generate your read me - AI may assist
@@ -40,7 +36,7 @@ public class AccountingLedgerApp {
             // Handle user input with a switch statement
             switch (homeSelect) {
                 case "D":
-                    // Get the Deposit information - date|time|description|vendor(transactionID|type|amount|account  -
+                    // Get the Deposit information - date|time|description|vendor|type|amount|account  -
                     addDeposit();
 
                     System.out.println("Deposit");
@@ -51,10 +47,7 @@ public class AccountingLedgerApp {
                     break;
                 case "L":
                     System.out.println("Ledger");
-                    //A - Loops through all the transactions
-                    //D - Loop through all the tranasctions to find if its a deposit
-                    //P - loops through all transactions to find if its a payment
-                    //R - An
+                    theLedger();
                     break;
                 case "X":
                     System.out.println("Exit");
@@ -93,7 +86,7 @@ public class AccountingLedgerApp {
                     , description,
                     vendor, // Generate a unique transaction ID
                     amount, // Amount
-                    "Debit", // Type (all deposits are credits)
+                    "Credit", // Type (all deposits are credits)
                     account // Account type
             );
 
@@ -135,7 +128,7 @@ public class AccountingLedgerApp {
                     , description,
                     vendor, // Generate a unique transaction ID
                     amount, // Amount
-                    "Credit", // Type (all deposits are credits)
+                    "Debit", // Type (all payments are debit)
                     account // Account type
             );
 
@@ -155,9 +148,63 @@ public class AccountingLedgerApp {
         }
     }
 
+    public static String theLedger(){
+        boolean appRunning = true;
+        String ledgerSelect = ""; // stores user choice
+
+        while (appRunning) {
+            //display the welcome message and the home screen
+            System.out.println("Welcome to the Ledger!");
+            System.out.println("These are your following options:");
+            System.out.println("(A) View all Entries");
+            System.out.println("(D) View all Deposits");
+            System.out.println("(P) View all Payments");
+            System.out.println("(R) Run Reports or Run a Custom Search");
+            System.out.println("(H) Return to Home Screen");
+
+            //get the user's input
+            ledgerSelect = theScanner.nextLine().trim().toUpperCase();
+
+            // Handle user input with a switch statement
+            switch (ledgerSelect) {
+                case "A":
+                    printAllTransactionsFile();
+                    break;
+                case "D":
+                    printDepositTransactions();
+                    break;
+                case "P":
+                    printPaymentTransactions();
+                    break;
+                case "R":
+                    System.out.println("Reports");
+                    break;
+                case "H":
+                    System.out.println("Returning to the Home Screen...");
+                    homeScreen(); // Call the homeScreen method
+                    return ""; // breaks out of the ledger loop
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+
+            }
+        }
+        return ledgerSelect; //Returns the last valid choice
+    }
+
 
     public static void writeTransactionToFile(Transaction transaction) {
-        try (BufferedWriter bufWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
+        String filePath = "src/main/resources/transactions.csv";
+        File file = new File(filePath);
+
+        try (BufferedWriter bufWriter = new BufferedWriter(new FileWriter(filePath, true))) {
+            // Check if the file is empty, and if so, write the header
+            if (file.length() == 0) {
+                String header = "Date|Time|Description|Vendor|Type|Amount|Account";
+                bufWriter.write(header);
+                bufWriter.newLine();
+            }
+
             // Format the transaction details
             String output = LocalDateTime.now().format(formatter) + "|" +
                     transaction.getDescription() + "|" +
@@ -175,7 +222,91 @@ public class AccountingLedgerApp {
         }
     }
 
+    public static void printAllTransactionsFile() {
+        try (BufferedReader bufReader = new BufferedReader(new FileReader("src/main/resources/transactions.csv"))) {
 
+            String line; // To store each line read from the file
+
+            System.out.println("Reading Transactions from transactions.csv...");
+            System.out.println("------------------------------------------------");
+
+            // Read each line from the file and print it
+            while ((line = bufReader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            System.out.println("------------------------------------------------");
+            System.out.println("Finished reading transactions.");
+
+        } catch (Exception e) {
+            System.out.println("An error occurred while reading the transactions from the file.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void printDepositTransactions() {
+        try (BufferedReader bufReader = new BufferedReader(new FileReader("src/main/resources/transactions.csv"))) {
+
+            String line; // To store each line read from the file
+
+            System.out.println("Reading Deposit from transactions.csv...");
+            System.out.println("------------------------------------------------");
+
+            // Skip the header line
+            String header = bufReader.readLine();
+            System.out.println(header); // Optionally print the header if needed
+
+            while ((line = bufReader.readLine()) != null) {
+                // Splits the lines into fields using pipes "|"
+                String[] parts = line.split("\\|");
+
+                //checks if lines have the debit string, because all payments are debit
+                if(parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Credit")){
+                    System.out.println(line);
+
+                }
+            }
+
+            System.out.println("------------------------------------------------");
+            System.out.println("Finished reading Payment transactions.");
+
+        } catch (Exception e) {
+            System.out.println("An error occurred while reading the transactions from the file.");
+            e.printStackTrace();
+        }
+    }
+
+    public static void printPaymentTransactions() {
+        try (BufferedReader bufReader = new BufferedReader(new FileReader("src/main/resources/transactions.csv"))) {
+
+            String line; // To store each line read from the file
+
+            System.out.println("Reading Deposit from transactions.csv...");
+            System.out.println("------------------------------------------------");
+
+            // Skip the header line
+            String header = bufReader.readLine();
+            System.out.println(header); // Optionally print the header if needed
+
+            while ((line = bufReader.readLine()) != null) {
+                // Splits the lines into fields using pipes "|"
+                String[] parts = line.split("\\|");
+
+                //checks if lines have the debit string, because all payments are debit
+                if(parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Debit")){
+                    System.out.println(line);
+
+                }
+            }
+
+            System.out.println("------------------------------------------------");
+            System.out.println("Finished reading Payment transactions.");
+
+        } catch (Exception e) {
+            System.out.println("An error occurred while reading the transactions from the file.");
+            e.printStackTrace();
+        }
+    }
 
 
 }
