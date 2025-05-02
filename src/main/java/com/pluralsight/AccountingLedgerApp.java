@@ -1,7 +1,7 @@
 package com.pluralsight;
 
 import java.io.*;
-import java.time.LocalDateTime;
+        import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
@@ -11,18 +11,21 @@ public class AccountingLedgerApp {
 
     static Scanner theScanner = new Scanner(System.in);
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd|HH:mm:ss");
+    static boolean appRunning = true;
 
     public static void main(String[] args) {
-        String userChoice = homeScreen();
-        System.out.println(userChoice);
+        while(appRunning){
+            homeScreen();
+        }
+        System.out.println("Goodbye!");
     }
 
+
     public static String homeScreen() {
-        boolean appRunning = true;
         String homeSelect = ""; // stores user choice
 
         while (appRunning) {
-            //display the welcome message and the home screen
+            //display the welcome message and the home screen options
             System.out.println("Welcome to the Account Ledger App!");
             System.out.println("Here are your following options:");
             System.out.println("(D) Add Deposit");
@@ -36,22 +39,23 @@ public class AccountingLedgerApp {
             // Handle user input with a switch statement
             switch (homeSelect) {
                 case "D":
-                    // Get the Deposit information - date|time|description|vendor|type|amount|account  -
+                    //Deposit Functionality
                     addDeposit();
-
                     System.out.println("Deposit");
                     break;
                 case "P":
+                    //Payment Functionality
                     makePayment();
                     System.out.println("Payment");
                     break;
                 case "L":
-                    System.out.println("Ledger");
+                    //Ledger Functionality
                     theLedger();
                     break;
                 case "X":
+                    //Exits application
                     System.out.println("Exit");
-                    appRunning = false;
+                    appRunning = false; //stops entire application
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");
@@ -105,8 +109,9 @@ public class AccountingLedgerApp {
             e.printStackTrace();
         }
     }
-    public static void makePayment(){
-        try{
+
+    public static void makePayment() {
+        try {
             System.out.println("Enter a description for the payment (e.g., 'Rent'): ");
             String description = theScanner.nextLine();
 
@@ -148,11 +153,11 @@ public class AccountingLedgerApp {
         }
     }
 
-    public static String theLedger(){
-        boolean appRunning = true;
+    public static void theLedger() {
+        boolean ledgerAppRunning = true;
         String ledgerSelect = ""; // stores user choice
 
-        while (appRunning) {
+        while (ledgerAppRunning && appRunning) {
             //display the welcome message and the home screen
             System.out.println("Welcome to the Ledger!");
             System.out.println("These are your following options:");
@@ -177,19 +182,24 @@ public class AccountingLedgerApp {
                     printPaymentTransactions();
                     break;
                 case "R":
-                    System.out.println("Reports");
+                    ledgerReports();
                     break;
                 case "H":
                     System.out.println("Returning to the Home Screen...");
                     homeScreen(); // Call the homeScreen method
-                    return ""; // breaks out of the ledger loop
+                    ledgerAppRunning = false;
+                    break;
+                case "X":
+                    System.out.println("Exit");
+                    appRunning = false; // Stop the entire application
+                    ledgerAppRunning = false; // Exit theLedger loop
+                    break;
                 default:
                     System.out.println("Invalid option. Please try again.");
                     break;
 
             }
         }
-        return ledgerSelect; //Returns the last valid choice
     }
 
 
@@ -261,7 +271,7 @@ public class AccountingLedgerApp {
                 String[] parts = line.split("\\|");
 
                 //checks if lines have the debit string, because all payments are debit
-                if(parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Credit")){
+                if (parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Credit")) {
                     System.out.println(line);
 
                 }
@@ -277,6 +287,7 @@ public class AccountingLedgerApp {
     }
 
     public static void printPaymentTransactions() {
+        // intializes the Buffer reader
         try (BufferedReader bufReader = new BufferedReader(new FileReader("src/main/resources/transactions.csv"))) {
 
             String line; // To store each line read from the file
@@ -293,7 +304,7 @@ public class AccountingLedgerApp {
                 String[] parts = line.split("\\|");
 
                 //checks if lines have the debit string, because all payments are debit
-                if(parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Debit")){
+                if (parts.length >= 3 && parts[parts.length - 3].equalsIgnoreCase("Debit")) {
                     System.out.println(line);
 
                 }
@@ -308,5 +319,97 @@ public class AccountingLedgerApp {
         }
     }
 
+    public static void ledgerReports() {
+        boolean reportsAppRunning = true;
+        String reportSelect = ""; // stores user choice
+
+        while (reportsAppRunning && appRunning) {
+            //display the welcome message and the home screen
+            System.out.println("Welcome to the Reports!");
+            System.out.println("(1) Month to Date");
+            System.out.println("(2) Previous Month");
+            System.out.println("(3) Year To Date");
+            System.out.println("(4) Previous Year");
+            System.out.println("(5) Search by Vendor");
+            System.out.println("(0) Back");
+
+            //get the user's input
+            reportSelect = theScanner.nextLine().trim().toUpperCase();
+
+            // Handle user input with a switch statement
+            switch (reportSelect) {
+                case "1":
+                    System.out.println("Month to Date");
+                    break;
+                case "2":
+                    System.out.println("Month Previous Month");
+                    break;
+                case "3":
+                    System.out.println("Year to Date");
+                    break;
+                case "4":
+                    System.out.println("Previous Year");
+                    break;
+                case "5":
+                    searchByVendor();
+                    break;
+                case "0":
+                    System.out.println("Returning to the Home Screen...");
+                    theLedger(); // Call the homeScreen method
+                    break;
+                case "X":
+                    System.out.println("Exit");
+                    appRunning = false; // Stop the entire application
+                    reportsAppRunning = false; // Exit ledgerReports loop
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+
+            }
+        }
+    }
+
+
+    //Search By vendor is going to be very similar to
+    public static void searchByVendor() {
+        String filePath = "src/main/resources/transactions.csv";
+
+        try (BufferedReader bufReader = new BufferedReader(new FileReader(filePath))) {
+            System.out.println("Enter the vendor name to search for (e.g., 'Costco', 'Landlord'):");
+            String searchVendor = theScanner.nextLine().trim(); // Get user input for vendor
+
+            String line; // To store each line read from the file
+            boolean matchFound = false; // Flag to check if any match is found
+
+            System.out.println("Transactions with vendor: " + searchVendor);
+            System.out.println("------------------------------------------------");
+
+            // Skip the header line
+            String header = bufReader.readLine();
+            System.out.println(header); // Optionally print the header once
+
+            // Loop through each line in the file
+            while ((line = bufReader.readLine()) != null) {
+                // Split the line into fields using the delimiter "|"
+                String[] parts = line.split("\\|");
+
+                // Check if the file has the correct structure and if the vendor matches
+                if (parts.length >= 4 && parts[3].equalsIgnoreCase(searchVendor)) {
+                    System.out.println(line); // Print the matching line
+                    matchFound = true;
+                }
+            }
+
+            if (!matchFound) {
+                System.out.println("No transactions found for the vendor: " + searchVendor);
+            }
+
+            System.out.println("------------------------------------------------");
+        } catch (Exception e) {
+            System.out.println("An error occurred while searching for the vendor.");
+            e.printStackTrace();
+        }
+    }
 
 }
