@@ -60,7 +60,6 @@ public class Transaction {
         this.type = type;
     }
 
-
     public String getAccount() {
         return this.account;
     }
@@ -90,6 +89,7 @@ public class Transaction {
         return true;
 
     }
+
 
     public double applyTransaction(double currentBalance) {
         if (type.equalsIgnoreCase("Debit")) {
